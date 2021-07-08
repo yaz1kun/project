@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网课查题助手 - 不知名Coder</title>
+
+    <link rel="stylesheet" href="./layui-v2.6.8/layui/css/layui.css">
+    <link rel="stylesheet" href="./css/layui-main.css">
+
+
+</head>
+
+<body>
+    <!-- 
+        常规布局
+     -->
+    <div class="layui-container">
+        <!-- 
+            定义行 * 2
+         -->
+        <div class="layui-row">
+            <!-- 导航 -->
+            <div class="layui-col-md6 layui-col-md-offset3">
+                <ul class="layui-nav " lay-filter="">
+                    <li class="layui-nav-item layui-this"><a href="./index.html">首页</a></li>
+                    <li class="layui-nav-item"><a href="https://emisun.cn">博客</a></li>
+                    <li class="layui-nav-item"><a href="https://github.com/yaz1kun">Github</a></li>
+                    <!-- 头像 -->
+                    <li class="layui-nav-item layui-col-md-offset4">
+                        <a href="javascript:;" id="login" name='login' onclick="login()"><img src="" class="layui-nav-img">登录</a>
+                        <dl class="layui-nav-child">
+                            <dd id="repass" style="display: none;"><a href="javascript:layer.msg('暂不支持');">修改密码</a></dd>
+                        </dl>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+        <!-- 分割线 -->
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset3">
+                <hr>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset3">
+
+
+                <form class="layui-form" action="" target="nm_iframe">
+                    <!-- token -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="right: 25px;">TOKEN</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="token" name="token" required lay-verify="" disabled autocomplete="off" class="layui-input" placeholder="未登录" value="">
+                        </div>
+                    </div>
+
+
+                    <!-- 题目 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="right: 30px;">题目</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="problems" required lay-verify="required" placeholder="请输入题目" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+
+
+                    <!-- 接口 -->
+                    <div class="layui-form-item">
+                        <label class="layui-form-label" style="right: 30px;">接口</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="interface" value="1" title="接口1" checked>
+                            <input type="radio" name="interface" value="2" title="接口2">
+                        </div>
+                    </div>
+
+                    <!-- 提交 -->
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button id="queryAnswer" class="layui-btn" lay-submit lay-filter="queryAnswer">查询</button>
+                        </div>
+                    </div>
+
+                </form>
+                <iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+            </div>
+        </div>
+        <!-- 分割线 -->
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset3">
+                <hr>
+            </div>
+        </div>
+        <!-- 日志 -->
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset6">
+                <h2 class="layui-text">日志输出</h2>
+            </div>
+        </div>
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset3">
+                <textarea name='result' id="result" placeholder="日志输出区" disabled class="layui-textarea add-log"></textarea>
+            </div>
+        </div>
+
+
+        <!-- 答案 -->
+        <div class="layui-row">
+            <div class="layui-col-md6 layui-col-md-offset3">
+                <textarea name='aw' id="aw" placeholder="答案" disabled class="layui-textarea add-log"></textarea>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <!-- <button class="layui-btn" onclick="document.getElementById('repass').style.display = 'block'">登录</button> -->
+
+    <div class='layui-container layui-col-md-offset5'>
+        <a href="https://emisun.cn">不知名Coder - emisun.cn</a></div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="./layui-v2.6.8/layui/layui.js"></script>
+<script>
+    layui.use('form', function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(queryAnswer)', function(data) {
+            var senddata = JSON.stringify(data.field);
+            var a = JSON.parse(senddata);
+            document.getElementsByName("result")[0].value += '[' + new Date().toLocaleString() + ']' + '提交查询' + '\n';
+            $.ajax({
+                type: 'POST',
+                url: './doc/api.php', //发送请求
+                data: {
+                    'problems': a.problems,
+                    'interface': a.interface,
+                    'token': a.token
+                },
+                success: function(result) {
+                    var b = JSON.parse(result);
+                    if (b.code == 'ok') {
+                        document.getElementsByName("result")[0].value += '[' + new Date().toLocaleString() + ']' + '查询成功' + '\n';
+                        document.getElementsByName("aw")[0].value = b.answer;
+                    } else {
+                        document.getElementsByName("result")[0].value += '[' + new Date().toLocaleString() + ']' + '查询失败:' + b.msg + '\n';
+                    }
+
+                }
+            });
+
+
+
+        });
+    });
+
+    function login() {
+        layer.open({
+            type: 2,
+            title: '用户登录',
+            maxmin: true,
+            skin: 'layui-layer-lan',
+            shadeClose: true,
+            area: ['400px', '280px'],
+            content: './login.html'
+        });
+    }
+</script>
+
+
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./layui-v2.6.8/layui/css/layui.css">
+</head>
+
+<body>
+
+
+    <form class="layui-form" action="" target="nm_iframe">
+        <!-- user -->
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="right: 10px;">用户名：</label>
+            <div class="layui-input-block">
+                <input type="text" name="user" required lay-verify="required" autocomplete="off" class="layui-input" placeholder="用户名/手机号/邮箱" value="">
+            </div>
+        </div>
+
+
+        <!-- password -->
+        <div class="layui-form-item">
+            <label class="layui-form-label" style="right: 10px;">密码：</label>
+            <div class="layui-input-block">
+                <input type="password" name="pass" required lay-verify="required" placeholder="密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <!-- 登录 注册 -->
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button id="login" class="layui-btn" lay-submit lay-filter="login">登录</button>
+                <button id="register" class="layui-btn" lay-submit lay-filter="register" onclick="layer.msg('暂不支持')">注册</button>
+            </div>
+        </div>
+
+
+
+    </form>
+    <iframe id="id_iframe" name="nm_iframe" style="display:none;"></iframe>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="./layui-v2.6.8/layui/layui.js"></script>
+
+
+<script>
+    layui.use('form', function() {
+        var form = layui.form;
+        //监听提交
+        form.on('submit(login)', function(data) {
+            var senddata = JSON.stringify(data.field);
+            var a = JSON.parse(senddata);
+            $.ajax({
+                type: 'POST',
+                url: './doc/login.php', //发送请求
+                data: {
+                    'user': a.user,
+                    'pass': a.pass,
+                },
+                success: function(result) {
+                    var b = JSON.parse(result);
+                    if (b.code == 'ok') {
+                        layer.msg(b.msg);
+                        //调用父窗口的function addPersonalCenter(){}方法，在父窗口右上角增加一个个人中心按钮
+                        window.parent.document.getElementById('repass').style.display = 'block';
+                        window.parent.document.getElementById('token').value = b.token;
+                        window.parent.document.getElementById('login').innerText = a.user;
+                        // 先获取窗口索引，才能关闭窗口
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    } else {
+                        layer.msg(b.msg);
+                    }
+
+                }
+            });
+
+
+
+        });
+    });
+</script>
+
+
+
+
+
+
+
+</html>
