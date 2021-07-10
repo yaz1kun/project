@@ -16,4 +16,6 @@ PHP 5.6+
 
 1.登录  
 2.查题  
-3.doc/login 目录中包含新增用户sql语句  
+3.doc/login 目录中包含新增用户sql语句
+4.注册(update on 2021.7.10)  
+
