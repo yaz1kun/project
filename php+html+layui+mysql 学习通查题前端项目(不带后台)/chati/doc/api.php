@@ -27,7 +27,7 @@
             if($result['code'] == 1){
                 return '{"answer":"'. $result['data'] .'","code":"ok","msg":"查询成功"}';
             }else{
-                return '{"code":"error","msg","'. $result['msg'] .'"}';
+                return '{"code":"error","msg":"'. $result['msg'] .'"}';
             }
             
         }
